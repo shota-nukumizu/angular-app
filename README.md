@@ -171,3 +171,74 @@ export class HeroesComponent implements OnInit {
 ```
 
 これでコンポーネントビューを表示できる。
+
+## Heroインターフェイスの作成
+
+`src/app`フォルダ内に`hero.ts`を作成し、Heroインターフェイスを作成する。それに`id`と`name`をそれぞれ与える。
+
+`src/app/hero.ts`
+
+```typescript
+export interface Hero {
+    id: number
+    name: string
+}
+```
+
+`HeroesComponent`クラスに戻って、`Hero`インターフェイスをインポート。コンポーネントの`hero`プロパティを`Hero`型に**リファクタリング(ソフトウェアの挙動を変えることなく、その内部構造を整理すること)**する。それを`1`という`id`と`Windstorm`という`name`で初期化する。
+
+`HeroesComponent`のクラスファイルは以下の通り。
+
+`src/app/heroes/heroes.component.ts`
+
+```typescript
+import { Component, OnInit } from '@angular/core';
+import { Hero } from '../hero'; //hero.tsからHeroインターフェイスをインポート
+
+@Component({
+  selector: 'app-heroes',
+  templateUrl: './heroes.component.html',
+  styleUrls: ['./heroes.component.css']
+})
+// この際、ヒーローを文字列からオブジェクトに変更したので、ページが正しく表示されない。
+export class HeroesComponent implements OnInit {
+  hero: Hero = {
+    id: 1,
+    name: 'Windstorm'
+  }
+  constructor() {}
+
+  ngOnInit(): void {
+  }
+
+}
+```
+
+## ヒーローオブジェクトの表示
+
+`heroes.component.html`
+
+```html
+<p>heroes works!</p>
+<h2>{{ hero.name }} Details</h2>
+<div>
+    <span>id: </span>{{ hero.id }}
+</div>
+<div>
+    <span>name: </span>{{ hero.name }}
+</div>
+```
+
+## UppercasePipeで書式設定
+
+`hero.name`のバインディングを以下のように修正する。
+
+`heroes.component.html`
+
+```html
+<h2>{{ hero.name | uppercase }} Details</h2>
+```
+
+ブラウザが更新され、ヒーローの名前が大文字で表示されるようになる。
+
+パイプは、文字列、通貨金額、日付やその他の表示データの書式設定に最適。Angularには複数のパイプが備わっているので、オリジナルのパイプを作成できる。
