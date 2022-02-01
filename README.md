@@ -133,5 +133,41 @@ CLIは次の３つのメタデータプロパティを生成する。
 `src/app/heroes/heroes.component.ts`
 
 ```typescript
+import { Component, OnInit } from '@angular/core';
 
+@Component({
+  selector: 'app-heroes',
+  templateUrl: './heroes.component.html',
+  styleUrls: ['./heroes.component.css']
+})
+export class HeroesComponent implements OnInit {
+  hero = 'Windstorm'
+  constructor() {}
+
+  ngOnInit(): void {
+  }
+
+}
 ```
+
+### ヒーローを表示する
+
+`hero.component.html`テンプレートファイルを開く。Angular CLIで生成されたデフォルトのテキストを削除し、それを新しい`hero`プロパティへのデータバインディングに置換する。
+
+```html
+<p>heroes works!</p>
+<h2>{{ hero }}</h2>
+```
+
+## HeroesComponentビューの表示
+
+`HeroesComponent`を表示するには、それをアプリケーションシェルの`AppComponent`のテンプレートに追加する必要がある。
+
+`AppComponent`のテンプレートファイルで、タイトルの直下に`<app-heroes>`要素を追加する。
+
+```html
+<h1>{{ title }}</h1>
+<app-heroes></app-heroes>
+```
+
+これでコンポーネントビューを表示できる。
