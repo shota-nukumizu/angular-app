@@ -82,3 +82,56 @@ body, input[type="text"], button {
 }
 ```
 
+## エディタの作成
+
+### heroesコンポーネントの作成
+
+Angular CLIを活用して、`heroes`という名前の新しいコンポーネントを生成する。
+
+```
+$ ng generate component heroes
+```
+
+CLIは`src/app/heroes/`という新しいフォルダを作成し、`HeroesComponent`に関する3つのファイルをテストファイルと一緒に生成する。
+
+`HeroesComponent`のクラスファイルは以下の通り。
+
+`app/heroes/heroes.component.ts`
+
+```typescript
+import { Component, OnInit } from '@angular/core';
+
+@Component({
+  selector: 'app-heroes',
+  templateUrl: './heroes.component.html',
+  styleUrls: ['./heroes.component.css']
+})
+export class HeroesComponent implements OnInit {
+
+  constructor() { }
+
+  ngOnInit(): void {
+  }
+
+}
+```
+
+このとき、常にAngularコアライブラリから`Component`シンボルをインポートし、コンポーネントクラスに`@Component`で注釈をつける。
+
+`@Component`はコンポーネントのAngularメタデータを指定するデコレータ関数である。
+
+CLIは次の３つのメタデータプロパティを生成する。
+
+* `selector`―コンポーネントのCSS要素セレクタ
+* `templateUrl`―コンポーネントのテンプレートファイルの場所
+* `styleUrls`―コンポーネントのプライベートCSSスタイルの場所
+
+`ngOnInit()`はライフサイクルフックである。**ライフサイクルフックとは、Angularがコンポーネントクラスをインスタンス化してコンポーネントビューとその子ビューをレンダリングするときに開始する機能**である。
+
+### heroプロパティの追加
+
+`src/app/heroes/heroes.component.ts`
+
+```typescript
+
+```
