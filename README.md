@@ -279,5 +279,48 @@ imports: [
 `heroes.component.html`
 
 ```html
+<div>
+    <label for="name">Hero name: </label>
+    <input id="name" [(ngModel)]="hero.name" placeholder="name">
+</div>
+```
+
+`[(ngModel)]`はAngularの双方向データバインディング構文である。
+
+これで`hero.name`プロパティをHTMLのテキストボックスにバインドするので、`hero.name`プロパティからテキストボックスへ、テキストボックスから`hero.name`プロパティへ双方向へデータを流せる。
+
+## HeroesComponentの宣言
+
+すべてのコンポーネントは、たった一つのNgModuleで宣言される必要がある。しかし、`HeroesComponent`を宣言していないのに、どうしてアプリは作動したのか？
+
+それは、Angularが`HeroesComponent`を生成した際に、`AppModule`でそのコンポーネントの宣言を行っていたから。
+
+`src/app/app.module.ts`
+
+```typescript
+import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { FormsModule } from '@angular/forms';
+
+import { AppRoutingModule } from './app-routing.module';
+import { AppComponent } from './app.component';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { HeroesComponent } from './heroes/heroes.component'; // 自動追加
+
+@NgModule({
+  declarations: [
+    AppComponent,
+    HeroesComponent
+  ],
+  imports: [
+    BrowserModule,
+    FormsModule,
+    AppRoutingModule,
+    NgbModule
+  ],
+  providers: [],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
 
 ```
