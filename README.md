@@ -242,3 +242,42 @@ export class HeroesComponent implements OnInit {
 ブラウザが更新され、ヒーローの名前が大文字で表示されるようになる。
 
 パイプは、文字列、通貨金額、日付やその他の表示データの書式設定に最適。Angularには複数のパイプが備わっているので、オリジナルのパイプを作成できる。
+
+## AppModule
+
+Angularでは、アプリケーションの商品がどのように合わさるか、アプリケーションが必要としている他のファイルやライブラリを知る必要がある。この情報をメタデータと呼ぶ。
+
+一部のメタデータは、コンポーネントクラスに追加した`@Component`デコレータ内にある。最も重要な`@NgModule`デコレータは、トップレベルのAppModuleクラスに注釈をつける。
+
+Angular CLIでは、プロジェクトを新規作成する際に`src/app/app.module.ts`に`AppModule`クラスを作成する。ここで`FormsModule`をオプトインする。
+
+### FormsModuleのインポート
+
+`AppModule`(`app.module.ts`)を開いて、`@angular/forms`ライブラリから`FormsModule`シンボルをインポートする。
+
+`app.module.ts`
+
+```typescript
+import { FormsModule } from '@angular/forms';
+```
+
+それから、`FormModule`を`@NgModule`メタデータを`imports`配列に追加する。この配列には、アプリケーションに必要な外部モジュールのリストが含まれる。
+
+`app.module.ts`
+
+```typescript
+imports: [
+  BrowserModule,
+  FormsModule
+],
+```
+
+## ヒーローの編集
+
+`HeroesComponent`テンプレートの詳細エリアをリファクタリングすると、以下のようになる。
+
+`heroes.component.html`
+
+```html
+
+```
