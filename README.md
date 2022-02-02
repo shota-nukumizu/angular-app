@@ -322,5 +322,89 @@ import { HeroesComponent } from './heroes/heroes.component'; // 自動追加
   bootstrap: [AppComponent]
 })
 export class AppModule { }
+```
 
+## ヒーローのモックを作成
+
+最終的には、リモートのデータサーバからそれらのヒーローを取得する。
+
+`src/app/mock-heroes.ts`を作成し、以下のプログラムを書く。
+
+```typescript
+import { Hero } from './hero';
+
+export const HEROES: Hero[] = [
+  { id: 11, name: 'Dr Nice' },
+  { id: 12, name: 'Narco' },
+  { id: 13, name: 'Bombasto' },
+  { id: 14, name: 'Celeritas' },
+  { id: 15, name: 'Magneta' },
+  { id: 16, name: 'RubberMan' },
+  { id: 17, name: 'Dynama' },
+  { id: 18, name: 'Dr IQ' },
+  { id: 19, name: 'Magma' },
+  { id: 20, name: 'Tornado' }
+];
+```
+
+## ヒーローを表示する
+
+`HeroesComponent`クラスのファイルを開いて、`HEROES`モックをインポートする。
+
+`heroes.component.ts`
+
+```typescript
+import { Component, OnInit } from '@angular/core';
+import { HEROES } from '../mock-heroes';
+
+@Component({
+  selector: 'app-heroes',
+  templateUrl: './heroes.component.html',
+  styleUrls: ['./heroes.component.css']
+})
+export class HeroesComponent implements OnInit {
+  heroes = HEROES
+  constructor() {}
+
+  ngOnInit(): void {
+  }
+
+}
+```
+
+### `*ngFor`でヒーローを表示
+
+`HeroesComponent`テンプレートを開き、次のように変更する。
+
+`heroes.component.html`
+
+```html
+<h2>My Heroes</h2>
+<ul class="heroes">
+    <li>
+        <span class="badge">{{ hero.id }}</span> {{ hero.name }}
+    </li>
+</ul>
+```
+
+これは一つのヒーローしか表示しないので、リスト化して表示するにはヒーローのリストを反復処理する必要がある。`*ngFor`を`<li>`要素に追加。
+
+```html
+<li *ngFor="let hero of heroes">
+```
+
+この際、プロパティ`hero`が存在しないので、エラーが表示されます。**この際、`ngFor`の前の`*`(アスタリスク)を必ずつける。これがないと動かないので注意しよう。**
+
+### ヒーローの装飾
+
+ヒーローをCSSファイル等で装飾する際には、CSSファイルとして特定の`@Component.styleUrls`配列の中で識別されるCSSファイルとして定義する。
+
+`src/app/heroes/heroes.component.ts`
+
+```typescript
+@Component({
+  selector: 'app-heroes',
+  templateUrl: './heroes.component.html',
+  styleUrls: ['./heroes.component.css']
+})
 ```
