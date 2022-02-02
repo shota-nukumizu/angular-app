@@ -408,3 +408,181 @@ export class HeroesComponent implements OnInit {
   styleUrls: ['./heroes.component.css']
 })
 ```
+
+## 詳細の表示
+
+### クリックイベントのバインディング
+
+クリックイベントのバインディングを`<li>`にこのように追加する。
+
+`heroes.component.html`
+
+```html
+<h2>My Heroes</h2>
+<ul class="heroes">
+  <!--追加-->
+  <li *ngFor="let hero of heroes" (click)="onSelect(hero)">
+      <span class="badge">{{ hero.id }}</span> {{ hero.name }}
+  </li>
+</ul>
+```
+
+### クリックイベントのハンドラー
+
+コンポーネントの`hero`プロパティを`selectedHero`にリネームするが、この場合はまだ割り当てない。
+
+以下のようにして`onSelect()`メソッドを追加し、クリックされたヒーローをテンプレートからコンポーネントの`selectedHero`に割り当てる。
+
+`src/app/heroes/heroes.component.ts`
+
+```typescript
+import { Component, OnInit } from '@angular/core';
+import { Hero } from '../hero';
+import { HEROES } from '../mock-heroes';
+
+@Component({
+  selector: 'app-heroes',
+  templateUrl: './heroes.component.html',
+  styleUrls: ['./heroes.component.css']
+})
+export class HeroesComponent implements OnInit {
+  // 追加
+  heroes = HEROES
+  selectedHero?: Hero
+  onSelect(hero: Hero):void {
+    this.selectedHero = hero
+  }
+  // 追加ここまで
+  constructor() {}
+
+  ngOnInit(): void {
+  }
+
+}
+```
+
+### 詳細セクションの追加
+
+現在、コンポーネントテンプレートにはリストがある。リストのヒーローをクリックして、そのヒーローの詳細を表示するには、それをテンプレートでレンダリングするための詳細セクションを追加する必要がある。
+
+`heroes.component.html`のリストセクションの下に以下を追加。
+
+```html
+<h2>{{selectedHero.name | uppercase}} Details</h2>
+<div><span>id: </span>{{selectedHero.id}}</div>
+<div>
+  <label for="hero-name">Hero name: </label>
+  <input id="hero-name" [(ngModel)]="selectedHero.name" placeholder="name">
+</div>
+```
+
+アプリケーションを実行すると、エラーが表示されてしまう。これを修正するには、`*ngIf`を使って空の`details`を非表示にする必要がある。**この際も、`ngIf`の前にある`*`を忘れないようにする。**
+
+`src/app/heroes/heroes.component.html`
+
+```html
+<div *ngIf="selectedHero">
+
+  <h2>{{selectedHero.name | uppercase}} Details</h2>
+  <div><span>id: </span>{{selectedHero.id}}</div>
+  <div>
+    <label for="hero-name">Hero name: </label>
+    <input id="hero-name" [(ngModel)]="selectedHero.name" placeholder="name">
+  </div>
+
+</div>
+```
+
+この際、ブラウザを更新すると名前の一覧が再度表示される。詳細のエリアは空白になっている。ヒーローのリストの中からヒーローをクリックし、詳細を表示する。
+
+### 挙動原理
+
+`seelctedHero`が定義されていない時、`ngIf`はDOMからヒーローの詳細を削除する。心配する`selectedHero`へのバインディングは存在しない。
+
+ユーザがヒーローを選択すると`selectedHero`は値を持って`ngIf`はヒーローの詳細をDOMの中に挿入する。
+
+### 選択されたヒーローを装飾する
+
+選択されたヒーローを装飾するために、先に追加したスタイルの中にある`.selected`というCSSクラスを追加できる。ユーザがクリックした時に`.selected`クラスを`<li>`に適用するためには、クラスバインディングを使用する。
+
+**Angularのクラスバインディングは条件に応じてCSSクラスを追加したり削除したりできる。装飾したい要素に`[class.some-css-class]="some-condition"`**を追加するだけで動く。
+
+`heroes.component.html`
+
+```html
+<h2>My Heroes</h2>
+<ul class="heroes">
+    <li *ngFor="let hero of heroes" [class.selected]="hero === selectedHero" (click)="onSelect(hero)">
+        <span class="badge">{{hero.id}}</span> {{hero.name}}
+    </li>
+</ul>
+
+<div *ngIf="selectedHero">
+
+    <h2>{{selectedHero.name | uppercase}} Details</h2>
+    <div><span>id: </span>{{selectedHero.id}}</div>
+    <div>
+        <label for="hero-name">Hero name: </label>
+        <input id="hero-name" [(ngModel)]="selectedHero.name" placeholder="name">
+    </div>
+
+</div>
+```
+
+`src/app/heroes/heroes.component.css`
+
+```css
+.heroes {
+  margin: 0 0 2em 0;
+  list-style-type: none;
+  padding: 0;
+  width: 15em;
+}
+.heroes li {
+  cursor: pointer;
+  position: relative;
+  left: 0;
+  background-color: #EEE;
+  margin: .5em;
+  padding: .3em 0;
+  height: 1.6em;
+  border-radius: 4px;
+}
+.heroes li:hover {
+  color: #2c3a41;
+  background-color: #e6e6e6;
+  left: .1em;
+}
+.heroes li.selected {
+  background-color: black;
+  color: white;
+}
+.heroes li.selected:hover {
+  background-color: #505050;
+  color: white;
+}
+.heroes li.selected:active {
+  background-color: black;
+  color: white;
+}
+.heroes .badge {
+  display: inline-block;
+  font-size: small;
+  color: white;
+  padding: 0.8em 0.7em 0 0.7em;
+  background-color:#405061;
+  line-height: 1em;
+  position: relative;
+  left: -1px;
+  top: -4px;
+  height: 1.8em;
+  margin-right: .8em;
+  border-radius: 4px 0 0 4px;
+}
+
+input {
+  padding: .5rem;
+}
+```
+
+これで選択されたヒーローをハイライト表示し、その詳細を表示するSPAを簡単に開発できる。
