@@ -784,5 +784,20 @@ export class HeroService {
 
   constructor() { }
 }
-
 ```
+
+## `HeroService`の提供
+
+Angularが`HeroesComponent`へ注入する前に、プロバイダを登録することで`HeroService`が依存性の注入システムで利用できる必要がある。プロバイダーとは、サービスを作成あるいは提供できるもの。この場合は、`HeroService`クラスをインスタンス化してサービスを提供する。
+
+`HeroService`をインジェクター(必要な場所でプロバイダーを選択して注入するためのオブジェクト)に登録することで、サービスを提供できるようになる。
+
+デフォルトでは、Angular CLIコマンド`ng generate service`は、プロバイダーのメタデータ、**言い換えれば`providedIn: 'root'`を`@Injectable()`デコレータに含めることで、プロバイダーをサービスのルートインジェクターに登録できる。**
+
+```typescript
+@Injectable({
+  providedIn: 'root',
+})
+```
+
+ルートレベルでサービスを提供すると、Angularは`HeroService`の単一の共有インスタンスを作成し、それを要求する任意のクラスに注入する。`@Injectable`メタデータでプロバイダーを登録すると、Angularはサービスが使用されなくなった際にそれを削除することでアプリケーションを最適化できる。
