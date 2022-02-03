@@ -979,3 +979,66 @@ export class MessageService {
   }
 }
 ```
+
+### `HeroService`への注入
+
+`HeroService`で`MessageService`をインポート。
+
+`src/app/hero.service.ts`
+
+```typescript
+import { MessageService } from './message.service';
+```
+
+プライベートな`messageService`プロパティを宣言するパラメータを使ってコンストラクタを変更する。Angularは`HeroService`を生成する際に、そのプロパティへシングルトンな`MessageService`を注入する。
+
+`src/app/hero.service.ts`
+
+```typescript
+constructor(private messageService: MessageService) { }
+```
+
+### `HeroService`からメッセージを送る
+
+ヒーローが取得された時にメッセージを送信するように`getHeroes()`メソッドを変更。
+
+`src/app/hero.service.ts`
+
+```typescript
+getHeroes(): Observable<Hero[]> {
+  const heroes = of(HEROES);
+  this.messageService.add('HeroService: fetched heroes');
+  return heroes;
+}
+```
+
+### `HeroService`からのメッセージを表示する
+
+`MessagesComponent`は`HeroService`がヒーローを取得した際に送信するメッセージを含めて、全てのメッセージを表示しなければならない。
+
+`MessagesComponent`を開いて、`MessageService`をインポート。
+
+`src/app/messages/messages.component.ts`
+
+```typescript
+import { MessageService } from '../message.service';
+```
+
+### `MessageService`へのバインド
+
+Angular CLIで生成された`MessagesComponent`のテンプレートを下記コードへ置き換えましょう。
+
+`src/app/messages/messages.component.html`
+
+```html
+<div *ngIf="messageService.messages.length">
+
+  <h2>Messages</h2>
+  <button class="clear"
+          (click)="messageService.clear()">Clear messages</button>
+  <div *ngFor='let message of messageService.messages'> {{message}} </div>
+
+</div>
+```
+
+`messages.component.css`をコンポーネントのスタイルに追加すると、このメッセージのUIの外観はより良いものになるだろう。
