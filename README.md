@@ -667,5 +667,53 @@ export class HeroDetailComponent implements OnInit {
   }
 
 }
-
 ```
+
+## `HeroDetailComponent`を表示する
+
+### `HeroesComponent`テンプレートの更新
+
+`HeroDetailComponent`のセレクターは`app-hero-detail`だ。
+
+ヒーローの詳細ビューがかつて存在した`HeroesComponent`テンプレートの下部に`<app-hero-detail>`を追加する。
+
+以下のように、`HeroesComponent.selectedHero`を、この要素の`hero`プロパティにバインドさせる。
+
+`heroes.component.html`
+
+```html
+<app-hero-detail [hero]="selectedHero"></app-hero-detail> 
+```
+
+`[hero]="selectedHero"`はAngularのプロパティバインディング。
+
+これは、`HeroesComponent`の`selectedHero`プロパティから、ターゲット要素の`hero`プロパティへの単方向データバインディングである。これは、`HeroDetailComponent`の`hero`プロパティがマッピングされる。
+
+ユーザがリスト内のヒーローをクリックすると、`selectedHero`が変更される。`selectedHero`が変更されると、プロパティバインディングは`hero`を更新して、`HeroDetailComponent`は新しいヒーローを表示する。
+
+`heroes.component.html`
+
+```html
+<h2>My Heroes</h2>
+
+<ul class="heroes">
+  <li *ngFor="let hero of heroes"
+    [class.selected]="hero === selectedHero"
+    (click)="onSelect(hero)">
+    <span class="badge">{{hero.id}}</span> {{hero.name}}
+  </li>
+</ul>
+
+<app-hero-detail [hero]="selectedHero"></app-hero-detail>
+```
+
+### 変更点
+
+以前は、ユーザがヒーロー名をクリックする際に、ヒーローのリストの下にヒーローの詳細が表示されていた。
+
+今では`HeroDetailComponent`が`HeroesComponent`の代わりにそれらの詳細を示している。
+
+* `HeroComponent`のスコープを減少。
+* 親の`HeroesComponent`に触れることなく、`HeroDetailComponent`をリッチなヒーローエディタに進化。
+* ヒーローの詳細ビューに触れることなく。`HeroesComponent`を進化。
+* 将来のコンポーネントのテンプレートで、`HeroDetailComponent`を再利用。
