@@ -586,3 +586,86 @@ input {
 ```
 
 これで選択されたヒーローをハイライト表示し、その詳細を表示するSPAを簡単に開発できる。
+
+
+## フィーチャーコンポーネントの作成
+
+単一のコンポーネントにすべての機能を保持しておくと、アプリケーションが成長するにつれて維持できなくなる。大きなコンポーネントを、特定のタスクやワークフローに焦点を当てた小さなサブコンポーネントに分割したいと考えることがある。
+
+### `HeroDetailComponent`の表示
+
+Angular CLIを使用して、`hero-detail`という新しい名前のコンポーネントを作成する。
+
+```
+$ ng generate component hero-detail
+```
+
+### templateの記述
+
+ヒーローの詳細が記されている`HeroesComponent`のテンプレートの下部から切り取り、`HeroDetailComponent`テンプレートに生成されたボイラープレートへ貼り付ける。
+
+この際に貼り付けられたHTMLは`selectedHero`を参照する。新しい`HeroDetailComponent`は、選択されたヒーローだけではなく、どんなヒーローにも表示される。したがって、テンプレート内すべての`selectedHero`を`hero`に置換してください。
+
+`src/app/hero-detail/hero-detail.component.html`
+
+```html
+<div *ngIf="hero">
+
+    <h2>{{ hero.name | uppercase }} Details</h2>
+    <div><span>id: </span>{{ hero.id }}</div>
+    <div>
+        <label for="hero-name">Hero name: </label>
+        <input id="hero-name" [(ngModel)]="hero.name" placeholder="name">
+    </div>
+
+</div>
+```
+
+### `@Input()`heroプロパティを追加
+
+`HerodetailComponent`クラスのファイルを追加して、`Hero`シンボルをインポートする。
+
+`src/app/hero-detail/hero-detail.component.ts`
+
+```typescript
+import { Hero } from '../hero';
+```
+
+`hero`プロパティは`@Input()`デコレータで注釈されたinputプロパティでなければなりません。これは、外側の`HeroesComponent`がこのようにバインドするため。
+
+```html
+<app-hero-detail [hero]="selectedHero"></app-hero-detail>
+```
+
+`Input`シンボルを含めるために、`@angular/core`のimport文を修正する。
+
+`hero-detail.component.ts`
+
+```typescript
+import { Component, OnInit, Input } from '@angular/core';
+```
+
+`@Input`デコレータが前についた`hero`プロパティを追加する。
+
+`src/app/hero-detail/hero-detail.component.ts`
+
+```typescript
+import { Component, OnInit, Input } from '@angular/core';
+import { Hero } from '../hero';
+
+@Component({
+  selector: 'app-hero-detail',
+  templateUrl: './hero-detail.component.html',
+  styleUrls: ['./hero-detail.component.css']
+})
+export class HeroDetailComponent implements OnInit {
+  @Input() hero?: Hero; // 追加
+
+  constructor() { }
+
+  ngOnInit(): void {
+  }
+
+}
+
+```
