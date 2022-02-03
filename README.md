@@ -956,3 +956,26 @@ Angular CLIを作成し、`src/app`配下に`MessageService`を作成する。
 ```
 $ ng generate service message
 ```
+
+`MessageService`を開いて、以下のコードへ修正する。
+
+`src/app/message.service.ts`
+
+```typescript
+import { Injectable } from '@angular/core';
+
+@Injectable({
+  providedIn: 'root',
+})
+export class MessageService {
+  messages: string[] = [];
+
+  add(message: string) {
+    this.messages.push(message);
+  }
+
+  clear() {
+    this.messages = [];
+  }
+}
+```
