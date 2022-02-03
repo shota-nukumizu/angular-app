@@ -801,3 +801,43 @@ Angularが`HeroesComponent`へ注入する前に、プロバイダを登録す�
 ```
 
 ルートレベルでサービスを提供すると、Angularは`HeroService`の単一の共有インスタンスを作成し、それを要求する任意のクラスに注入する。`@Injectable`メタデータでプロバイダーを登録すると、Angularはサービスが使用されなくなった際にそれを削除することでアプリケーションを最適化できる。
+
+## `HeroComponent`の更新
+
+`heroes.component.ts`
+
+```typescript
+import { Component, OnInit } from '@angular/core';
+import { Hero } from '../hero';
+import { HeroService } from '../hero.service'; // HEROESのインポートを削除し、HeroServiceを代わりにインポートする。
+
+@Component({
+  selector: 'app-heroes',
+  templateUrl: './heroes.component.html',
+  styleUrls: ['./heroes.component.css']
+})
+export class HeroesComponent implements OnInit {
+  heroes: Hero[] = [] // heroesプロパティの定義を宣言に置換する
+  selectedHero?: Hero
+  onSelect(hero: Hero):void {
+    this.selectedHero = hero
+  }
+  constructor(private heroService: HeroService) {} // HeroServiceの注入
+
+  getHeroes(): void {
+    this.heroes = this.heroService.getHeroes() // サービスからヒーローデータを取得するためのメソッドを作成する
+  }
+
+  ngOnInit(): void {
+    this.getHeroes() // 作成したメソッドはngOnInit()で呼び出す。
+  }
+
+}
+```
+
+【補足】<br>
+**`getHeroes()`はコンストラクターでも呼び出せるが、これは最適な方法ではない。**
+
+原則、Angularにおけるコンストラクターではプロパティ定義の簡単な初期化だけを行い、それ以外は何もするべきではない。実際にデータを取得する際に行うサーバへのHTTPリクエストを行う関数は呼び出すべきではない。
+
+**`getHeroes()`はコンストラクターではなく、`ngOnInit`ライフサイクルフックで呼び出す。**
