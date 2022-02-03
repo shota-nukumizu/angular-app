@@ -841,3 +841,81 @@ export class HeroesComponent implements OnInit {
 原則、Angularにおけるコンストラクターではプロパティ定義の簡単な初期化だけを行い、それ以外は何もするべきではない。実際にデータを取得する際に行うサーバへのHTTPリクエストを行う関数は呼び出すべきではない。
 
 **`getHeroes()`はコンストラクターではなく、`ngOnInit`ライフサイクルフックで呼び出す。**
+
+## Observableデータ
+
+`HeroService.getHeroes()`は同期的なメソッドで、これは`HeroService`が即座にヒーローデータを取得できることを意味する。
+
+また、`HeroesComponent`は`getHeroes()`の返り値がまるで同期的に取得できるかのように扱える。
+
+`src/app/heroes/heroes.component.ts`
+
+```typescript
+this.heroes = this.heroService.getHeroes();
+```
+
+**しかし、これは本番環境のアプリケーションでは機能しない。**
+
+今のアプリケーションはモックヒーローを返しているのでこれを免れていますが、リモートサーバからヒーローデータを取得するにあたってこの処理は非同期ということに気づく。
+
+**`HeroService`はサーバのレスポンスを持つ必要があり、`getHeroes()`は即座にヒーローデータを返せない。**そしてそのサービスが待機している間は、ブラウザはブロックされないだろう。
+
+**`HeroService.getHeroes()`は何らかの非同期処理を実装する必要がある。**
+
+
+### Observable `HeroService`
+
+`Observable`は[RxJSライブラリ](https://rxjs.dev/)で重要なクラスの一つ。RxJSの`of()`を使ってサーバからのデータ取得を行う。
+
+`HeroService`を開いて、`Observable`及び`of`を`RxJS`からインポートする。
+
+`src/app/hero.service.ts`
+
+```typescript
+import { Observable, of } from 'rxjs';
+```
+
+`getHeroes()`を以下のように書き直す。
+
+`src/app/hero.service.ts`
+
+```typescript
+getHeroes(): Observable<Hero[]> {
+  const heroes = of(HEROES);
+  return heroes;
+}
+```
+
+`of(HEROES)`は一つの値、すなわちモックヒーローの配列を出力する`Observable<Hero[]>`を返す。
+
+
+### `HeroesComponent`でのSubscribe
+
+`HeroService.getHeroes`メソッドは`Hero[]`を返していたが、現在の返り値は`Observable<Hero[]>`である。そのため、これらの違いを修正する必要がある。
+
+`getHeroes`を開いて、以下のコードに変更する。
+
+`heroes.component.ts`(Observable)
+
+```typescript
+getHeroes(): void {
+  this.heroService.getHeroes()
+    .subscribe(heroes => this.heroes = heroes)
+}
+```
+
+`heroes.component.ts`(Original)
+
+```typescript
+getHeroes(): void {
+  this.heroes = this.heroService.getHeroes();
+}
+```
+
+**`Observable.subscribe()`は重要な違い。**
+
+変更後のバージョンでは、`Observable`がヒーローの配列を出力するのを待つ。これは現在あるいは数分後に起こる可能性が高い。
+
+そのとき、`subscribe()`メソッドは出力された配列をコールバックに渡し、コンポーネントの`heroes`プロパティを設定する。
+
+この非同期的手法は、`HeroService`がサーバからヒーローを取得する際に正常に動作。
