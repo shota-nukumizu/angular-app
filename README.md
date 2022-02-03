@@ -717,3 +717,72 @@ export class HeroDetailComponent implements OnInit {
 * 親の`HeroesComponent`に触れることなく、`HeroDetailComponent`をリッチなヒーローエディタに進化。
 * ヒーローの詳細ビューに触れることなく。`HeroesComponent`を進化。
 * 将来のコンポーネントのテンプレートで、`HeroDetailComponent`を再利用。
+
+## サービスの追加
+
+アプリケーションを開発する際に、コンポーネント内で直接データの保存や取得を行うべきではない。コンポーネントはデータの受け渡しだけに集中し、その他の処理はサービスクラスへ委譲するべき。
+
+## `HeroService`の作成
+
+Angular CLIを作成し、`Hero Service`を作成する。
+
+```
+$ ng generate service hero
+```
+
+このコマンドは`HeroService`のスケルトンファイルを`src/app/hero.serive.ts`に以下のように保存する。
+
+```typescript
+import { Injectable } from '@angular/core';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class HeroService {
+
+  constructor() { }
+}
+```
+
+### `@Injectable()`サービス
+
+生成されたファイルの中でAngularのInjectableシンボルがインポートされ、`@Injectable()`デコレータとしてクラスを注釈することに注目する。これは、クラスを依存関係システムに参加するものとしてマークする。`HeroSerive`クラスは、注入可能なサービスを提供する予定で、それ自身が依存関係を持てる。
+
+### ヒーローデータの取得
+
+`HeroService`は様々な場所からヒーローデータを取得することがある。
+
+コンポーネントからデータ取得ロジックを切り離すことで、そのようなサービス側の事情に関係なくいつでも実装方針の変更ができます。コンポーネント側は、サービスがどのように動いているのか関係ありません。
+
+`Hero`と`HEROES`をインポート。
+
+`src/app/hero.service.ts`
+
+```typescript
+import { Hero } from './hero';
+import { HEROES } from './mock-heroes';
+```
+
+`getHeroes`メソッドを追加し、モックヒーローを完成する。
+
+`src/app/hero.service.ts`
+
+```typescript
+import { Injectable } from '@angular/core';
+import { Hero } from './hero';
+import { HEROES } from './mock-heroes';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class HeroService {
+
+  // 追加
+  getHeroes(): Hero[] {
+    return HEROES
+  }
+
+  constructor() { }
+}
+
+```
