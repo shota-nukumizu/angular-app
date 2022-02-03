@@ -919,3 +919,40 @@ getHeroes(): void {
 そのとき、`subscribe()`メソッドは出力された配列をコールバックに渡し、コンポーネントの`heroes`プロパティを設定する。
 
 この非同期的手法は、`HeroService`がサーバからヒーローを取得する際に正常に動作。
+
+## メッセージの表示
+
+このセクションでは、以下の方法について詳細に説明する。
+
+* メッセージを表示するための`MessageComponent`を画面下部に表示
+* 表示するメッセージを送信するために、アプリケーション全体で注入可能な`MessageService`を作成
+* `HeroService`に`MessageService`を注入
+* `HeroService`のデータ取得成功時にメッセージを表示
+
+### `MessagesComponent`の作成
+
+Angular CLIで`MessagesComponent`の作成。
+
+```
+$ ng generate component messages
+```
+
+Angular CLIは`src/app/messages`配下にコンポーネントファイル群を生成し、`AppModule`内に`MessagesComponent`を宣言する。
+
+作成した`MessagesComponent`を表示するために、`AppComponent`のテンプレートを修正する。
+
+`src/app/app.component.html`
+
+```html
+<h1>{{title}}</h1>
+<app-heroes></app-heroes>
+<app-messages></app-messages>
+```
+
+### `MessageService`の作成
+
+Angular CLIを作成し、`src/app`配下に`MessageService`を作成する。
+
+```
+$ ng generate service message
+```
