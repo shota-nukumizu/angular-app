@@ -1406,3 +1406,121 @@ Heroesリンクの上、`AppComponent`シェルテンプレートにダッシュ
 ```
 
 ブラウザが更新されると、リンクをクリックすることで二つのビューの間を自由に遷移できるようになる。
+
+## ヒーローの詳細ページを表示する
+
+`HeroDetailComponent`は選択されたヒーローの詳細を表示する。
+
+1. ダッシュボードのヒーローをクリックする
+2. ヒーローリストのヒーローをクリックする
+3. 表示するヒーローを識別するブラウザのアドレスバーにディープリンクURLを貼り付ける
+
+### `HeroesComponent`からヒーローの詳細を削除する
+
+ユーザが`HeroesComponent`で一つのヒーローをクリックすると、アプリは`HeroDetailComponent`に遷移する必要があり、ヒーローリストビューをヒーロー詳細ビューに置換する。
+
+`HeroesComponent`テンプレート(`heroes/heroes.component.html`)を開いて、`<app-hero-detail>`要素を一番下から削除する
+
+### ヒーローの詳細を表示するルートを設定
+
+`app-routing.module.ts`を開いて、`HeroDetailComponent`をインポートする。
+
+`src/app/app-routing.module.ts`
+
+```typescript
+import { HeroDetailComponent } from './hero-detail/hero-detail.component';
+```
+
+次に、ヒーロー詳細ビューへのパスのパターンと一致するパラメータ付きルートを`routes`配列に追加する。
+
+`src/app/app-routing.module.ts`
+
+```typescript
+{ path: 'detail/:id', component: HeroDetailComponent },
+```
+
+▲上記のプログラムと同じファイル
+
+```typescript
+const routes: Routes = [
+  { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
+  { path: 'dashboard', component: DashboardComponent },
+  { path: 'detail/:id', component: HeroDetailComponent },
+  { path: 'heroes', component: HeroesComponent }
+];
+```
+
+### `DashboardComponent`ヒーローへのリンク
+
+現時点では`DashboardComponent`ヒーローへのリンクは何もしない。
+
+ルーターは`HeroDetailComponent`へのルートを持っているので、ダッシュボードのリンクを修正してパラメータ付きダッシュボードのルート経由で遷移する。
+
+`src/app/dashboard/dashboard.component.html`
+
+```html
+<a *ngFor="let hero of heroes"
+  routerLink="/detail/{{hero.id}}">
+  {{hero.name}}
+</a>
+```
+
+`*ngFor`リピーター内でAngularの[補間バインディング](https://angular.jp/guide/interpolation)を活用し、現在の繰り返しの`hero.id`を個々の[`routerLink`](https://angular.jp/tutorial/toh-pt5#routerlink)に挿入する。
+
+
+### `HeroesComponent`ヒーローへのリンク
+
+`HeroesComponent`のヒーローのアイテムは、コンポーネントの`onSelect()`メソッドにバインディングされたクリックイベントを持つ`<li>`要素。
+
+`src/app/heroes/heroes.component.html`
+
+```html
+<ul class="heroes">
+  <li *ngFor="let hero of heroes"
+    [class.selected]="hero === selectedHero"
+    (click)="onSelect(hero)">
+    <span class="badge">{{hero.id}}</span> {{hero.name}}
+  </li>
+</ul>
+```
+
+こちらの`<li>`要素を`*ngFor`だけを持つように戻して、アンカー要素(`<a>`)でバッジと名前を囲み、ダッシュボードのテンプレートと同じようにアンカーに`routerLink`要素を追加。
+
+`src/app/heroes/heroes.component.html`
+
+```html
+<ul class="heroes">
+  <li *ngFor="let hero of heroes">
+    <a routerLink="/detail/{{hero.id}}">
+      <span class="badge">{{hero.id}}</span> {{hero.name}}
+    </a>
+  </li>
+</ul>
+```
+
+プライベートなスタイルシート(`heroes.component.css`)を修正して、これまでと同じようにリストが見えるようにする。
+
+### 不要なコードを削除
+
+`HeroesComponent`クラスはまだ動作するが、`onSelect()`メソッドと`selectedHero`プロパティはもはや使われない。
+
+不要なコードを削除する。(**必要最低限の機能で実装するため**)
+
+`src/app/heroes/heroes.component.ts`
+
+```typescript
+export class HeroesComponent implements OnInit {
+  heroes: Hero[] = [];
+
+  constructor(private heroService: HeroService) { }
+
+  ngOnInit(): void {
+    this.getHeroes();
+  }
+
+  getHeroes(): void {
+    this.heroService.getHeroes()
+    .subscribe(heroes => this.heroes = heroes);
+  }
+}
+```
