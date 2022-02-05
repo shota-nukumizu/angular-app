@@ -1252,3 +1252,158 @@ $ ng serve
 
 ## ダッシュボードビューを追加
 
+ルーティングは、複数のビューがある場合に更に意味を持つ。CLIを使って`DashBoardComponent`を追加する。
+
+```
+$ ng generate component dashboard
+```
+
+CLIは、`DashBoardComponent`のためのファイルを生成し、`AppModule`の中でそれを宣言する。これら3つのファイルのデフォルト内容を以下のように書き換える。
+
+`src/app/dashboard/dashboard.component.html`
+
+```html
+<h2>Top Heroes</h2>
+<div class="heroes-menu">
+  <a *ngFor="let hero of heroes">
+    {{hero.name}}
+  </a>
+</div>
+```
+
+`src/app/dashboard/dashboard.component.ts`
+
+```typescript
+import { Component, OnInit } from '@angular/core';
+import { Hero } from '../hero';
+import { HeroService } from '../hero.service';
+
+@Component({
+  selector: 'app-dashboard',
+  templateUrl: './dashboard.component.html',
+  styleUrls: [ './dashboard.component.css' ]
+})
+export class DashboardComponent implements OnInit {
+  heroes: Hero[] = [];
+
+  constructor(private heroService: HeroService) { }
+
+  ngOnInit(): void {
+    this.getHeroes();
+  }
+
+  getHeroes(): void {
+    this.heroService.getHeroes()
+      .subscribe(heroes => this.heroes = heroes.slice(1, 5));
+  }
+}
+```
+
+`src/app/dashboard/dashboard.component.css`
+
+```css
+/* DashboardComponent's private CSS styles */
+
+h2 {
+  text-align: center;
+}
+
+.heroes-menu {
+  padding: 0;
+  margin: auto;
+  max-width: 1000px;
+
+  /* flexbox */
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  align-content: flex-start;
+  align-items: flex-start;
+}
+
+a {
+  background-color: #3f525c;
+  border-radius: 2px;
+  padding: 1rem;
+  font-size: 1.2rem;
+  text-decoration: none;
+  display: inline-block;
+  color: #fff;
+  text-align: center;
+  width: 100%;
+  min-width: 70px;
+  margin: .5rem auto;
+  box-sizing: border-box;
+
+  /* flexbox */
+  order: 0;
+  flex: 0 1 auto;
+  align-self: auto;
+}
+
+@media (min-width: 600px) {
+  a {
+    width: 18%;
+    box-sizing: content-box;
+  }
+}
+
+a:hover {
+  background-color: #000;
+}
+```
+
+### ダッシュボードのルートを追加
+
+ダッシュボードに遷移するには、ルーターに適切なルートが必要である。`app-routiung.module.ts`で`DashboardComponent`をインポート。
+
+`src/app/app-routing.module.ts`
+
+```typescript
+import { DashboardComponent } from './dashboard/dashboard.component';
+```
+
+`routes`配列に、`DashboardComponent`へのパスにマッチするルートを追加。
+
+`src/app/app-routing.module.ts`
+
+```typescript
+{ path: 'dashboard', component: DashboardComponent },
+```
+
+### デフォルトルートの追加
+
+アプリケーションを起動すると、ブラウザのアドレスバーはWebサイトのルートを指す。これは既存のルートと一致しないので、ルーターはどこにも移動しない。`<router-outlet>`の下のスペースが空白になっているからだ。
+
+アプリケーションをダッシュボードに自動的に遷移するには、以下のルートを`routes`配列に追加。
+
+`src/app/app-routing.module.ts`
+
+```typescript
+{ path: '', redirectTo: '/dashboard', pathMatch: 'full' },
+```
+
+このルートは、空のパスと完全に一致するURLを、パスが`/dashboard`であるルートにリダイレクトする。
+
+ブラウザが更新されると、ルーターは`DashboardComponent`をロードし、ブラウザのアドレスバーには`/dashboard`のURLが表示される。
+
+### ダッシュボードのリンクをシェルに追加
+
+ユーザはページのトップにあるナビゲーション領域のリンクをクリックすることで、`DashboardComponent`と`HeroesComponent`のあいだを行き来することができます。
+
+Heroesリンクの上、`AppComponent`シェルテンプレートにダッシュボードのナビゲーションリンクを追加する。
+
+`src/app/app.component.html`
+
+```html
+<h1>{{title}}</h1>
+<nav>
+  <a routerLink="/dashboard">Dashboard</a>
+  <a routerLink="/heroes">Heroes</a>
+</nav>
+<router-outlet></router-outlet>
+<app-messages></app-messages>
+```
+
+ブラウザが更新されると、リンクをクリックすることで二つのビューの間を自由に遷移できるようになる。
