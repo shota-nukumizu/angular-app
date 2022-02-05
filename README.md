@@ -1204,3 +1204,27 @@ imports: [ RouterModule.forRoot(routes) ],
 ```typescript
 exports: [ RouterModule ]
 ```
+
+## `RouterOutlet`の追加
+
+`AppComponent`テンプレートを開いて、`<app-heroes>`要素を`<router-oulet>`に置換
+
+`src/app/app.component.html`
+
+```html
+<h1>{{title}}</h1>
+<router-outlet></router-outlet>
+<app-messages></app-messages>
+```
+
+### 試す
+
+こちらのCLIコマンドを入力
+
+```
+$ ng serve
+```
+
+ブラウザを更新するとアプリケーションのタイトルは表示されるが、ヒーローのリストは表示されない。
+
+ブラウザのアドレスバーを見ると、URLが`/`で終了。`HeroesComponent`へのルーターのパスは`/heroes`。これを入力すればおなじみのヒーローのマスター／詳細ビューが表示されるはず。(実際には表示されていない)
