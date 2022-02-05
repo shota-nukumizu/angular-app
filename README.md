@@ -1042,3 +1042,49 @@ Angular CLIで生成された`MessagesComponent`のテンプレートを下記�
 ```
 
 `messages.component.css`をコンポーネントのスタイルに追加すると、このメッセージのUIの外観はより良いものになるだろう。
+
+## `HeroService`にメッセージの追加
+
+ユーザがヒーローをクリックする際に、メッセージを送信、表示してユーザの選択履歴を表示する方法を示す。
+
+`src/app/heroes/heroes.component.ts`
+
+```typescript
+import { Component, OnInit } from '@angular/core';
+
+import { Hero } from '../hero';
+import { HeroService } from '../hero.service';
+import { MessageService } from '../message.service';
+
+@Component({
+  selector: 'app-heroes',
+  templateUrl: './heroes.component.html',
+  styleUrls: ['./heroes.component.css']
+})
+export class HeroesComponent implements OnInit {
+
+  selectedHero?: Hero;
+
+  heroes: Hero[] = [];
+
+  constructor(private heroService: HeroService, private messageService: MessageService) { }
+
+  ngOnInit(): void {
+    this.getHeroes();
+  }
+
+  onSelect(hero: Hero): void {
+    this.selectedHero = hero;
+    this.messageService.add(`HeroesComponent: Selected hero id=${hero.id}`);
+  }
+
+  getHeroes(): void {
+    this.heroService.getHeroes()
+        .subscribe(heroes => this.heroes = heroes);
+  }
+}
+```
+
+ヒーローリストを見るためにブラウザを更新し、一番下までスクロールすると`HeroService`からのメッセージが表示される。
+
+ヒーローをクリックするたびに、新しいメッセージが選択を登録して表示されるようになる。
