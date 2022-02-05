@@ -1524,3 +1524,151 @@ export class HeroesComponent implements OnInit {
   }
 }
 ```
+
+## ルーティング可能な`HeroDetailComponent`
+
+`HeroesComponent`は表示するヒーローを取得するための新しい方法が必要。
+
+* それを作成したルートを取得
+* ルートから`id`を抽出
+* `HeroService`を経由してサーバからその`id`でヒーローを取得する
+
+`src/app/hero-detail/hero-detail.component.ts`
+
+```typescript
+import { ActivatedRoute } from '@angular/router';
+import { Location } from '@angular/common';
+
+import { HeroService } from '../hero.service';
+```
+
+[`ActivatedRoute`](https://angular.jp/api/router/ActivatedRoute)、`HeroService`、[`Location`](https://angular.jp/api/common/Location)サービスをコンストラクタに入れて、それらの値をプライベートフィールドに保存。
+
+`src/app/hero-detail/hero-detail.component.ts`
+
+```typescript
+import { Component, OnInit, Input } from '@angular/core';
+import { Hero } from '../hero';
+
+import { ActivatedRoute } from '@angular/router';
+import { Location } from '@angular/common';
+
+import { HeroService } from '../hero.service';
+
+@Component({
+  selector: 'app-hero-detail',
+  templateUrl: './hero-detail.component.html',
+  styleUrls: ['./hero-detail.component.css']
+})
+export class HeroDetailComponent implements OnInit {
+  @Input() hero?: Hero;
+
+  // 追加
+  constructor(
+    private route: ActivatedRoute, // HeroDetailComponentのインスタンスのルートに関する情報を保持
+    private heroService: HeroService, // リモートサーバからヒーローのデータを取得し、このコンポーネントはそれを使用して表示するヒーローを取得
+    private location: Location // ブラウザと対話するためのAngularサービス。
+  ) { }
+
+  ngOnInit(): void {
+  }
+
+}
+
+```
+
+### `id`ルートパラメータを抽出
+
+`ngOnInit()`ライフサイクルハックで、`getHero()`を呼び出して以下のように定義する。
+
+`src/app/hero-detail/hero-detail.component.ts`
+
+```typescript
+ngOnInit(): void {
+  this.getHero();
+}
+
+getHero(): void {
+  const id = Number(this.route.snapshot.paramMap.get('id'));
+  this.heroService.getHero(id)
+    .subscribe(hero => this.hero = hero);
+}
+```
+
+`route.snapshot`は、コンポーネントが作成された直後のルート情報の静的イメージ。`paramMap`は、URLから抽出されたルートパラメータ値の辞書。`id`キーは、fetchするヒーローの`id`を返す。
+
+ルートパラメータは常に文字列。JavaScriptの`Number`関数は文字列を数値に変換。
+
+しかし、上記のプログラムではプライベート変数`heroService`に`getHero()`メソッドが定義されていないので、コンパイルエラーが表示される。
+
+### `HeroService.getHero()`の追加
+
+`HeroService`を開いて、`getHeroes()`メソッドの後に`id`とともに次の`getHero()`メソッドを追加する。
+
+`src/app/hero.service.ts`
+
+```typescript
+getHero(id: number): Observable<Hero> {
+  // 現時点では、このプログラムではHeroとidの型が一致しない型エラーが発生する。対処法は後述
+  const hero = HEROES.find(h => h.id === id)!;
+  this.messageService.add(`HeroService: fetched hero id=${id}`);
+  return of(hero);
+}
+```
+
+**このとき、`id`を埋め込むためのJavaScriptの[テンプレートリテラル](https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/template_strings)を定義するバッククォートに注意すること。**
+
+上記のプログラムでは、`getHero()`を呼び出す`HeroDetailComponent`を変更することなく、実際の`Http`リクエストとして`getHero()`を再実装できる。
+
+### 戻る方法を探す
+
+ブラウザの戻るボタンをクリックすると、詳細ビューに来た時の経路によって、ヒーローリストまたはダッシュボード画面に戻れる。
+
+`HeroDetail`ビュー上にそのような挙動を実装できるボタンを表示。コンポーネントのテンプレートの最後に戻るボタンを追加して、コンポーネントの`goBack()`メソッドにバインド。
+
+`src/app/hero-detail/hero-detail.component.html`
+
+```html
+<button (click)="goBack()">go back</button>
+```
+
+前述の通り導入した[`Location`](https://angular.jp/api/common/Location)サービスで、ブラウザの履歴の一つ前にナビゲートする`goBack()`メソッドをコンポーネントのクラスに追加。
+
+`src/app/hero-detail/hero-detail.component.ts`
+
+```typescript
+goBack(): void {
+  this.location.back();
+}
+```
+
+最後に、独自のCSSスタイルを`hero-detail.component.css`に追加すると、詳細がより美しく表示される
+
+`src/app/hero-detail/hero-detail.component.css`
+
+```css
+/* HeroDetailComponent's private CSS styles */
+label {
+  color: #435960;
+  font-weight: bold;
+}
+input {
+  font-size: 1em;
+  padding: .5rem;
+}
+button {
+  margin-top: 20px;
+  background-color: #eee;
+  padding: 1rem;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+button:hover {
+  background-color: #cfd8dc;
+}
+button:disabled {
+  background-color: #eee;
+  color: #ccc;
+  cursor: auto;
+}
+```
