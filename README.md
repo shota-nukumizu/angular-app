@@ -1088,3 +1088,119 @@ export class HeroesComponent implements OnInit {
 ヒーローリストを見るためにブラウザを更新し、一番下までスクロールすると`HeroService`からのメッセージが表示される。
 
 ヒーローをクリックするたびに、新しいメッセージが選択を登録して表示されるようになる。
+
+## ルーティングを使ったナビゲーションの追加
+
+以下の機能を実装する。
+
+* ダッシュボードビューを追加
+* ヒーローズビューとダッシュボードビューのあいだで行き来できる機能を追加
+* ユーザが各ビューでヒーロー名をクリックした際に、選択されたヒーローの詳細ビューを表示
+* ユーザがemail上でリンクをクリックした時、特定のヒーローの詳細ビューを表示
+
+## `AppRoutingModule`の追加
+
+Angularのベストプラクティスは、ルートの`AppModule`からインポートされるルーティング専用のトップレベルモジュールで、ルーターをロードして管理すること。
+
+モジュールのクラス名は`AppRoutingModule`とし、`src/app`フォルダの`app-routing.module.ts`に書く。
+
+CLIで生成できる。
+
+```
+$ ng generate module app-routing --module=app
+```
+
+生成されたファイルは以下のようになる
+
+`src/app/app-routing.module.ts`
+
+```typescript
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+
+
+@NgModule({
+  declarations: [],
+  imports: [
+    CommonModule
+  ]
+})
+export class AppRoutingModule { }
+
+```
+
+こちらのプログラムを以下のように書き換える。
+
+```typescript
+import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
+import { HeroesComponent } from './heroes/heroes.component';
+
+const routes: Routes = [
+  { path: 'heroes', component: HeroesComponent }
+];
+
+@NgModule({
+  imports: [RouterModule.forRoot(routes)],
+  exports: [RouterModule]
+})
+export class AppRoutingModule { }
+```
+
+最初にアプリケーションにルーティング機能をもたせられる`RouterModule`と`Routes`をインポートする。次のインポートである`HeroesComponent`は、ルートを設定することでルーターに向かう場所を教える。
+
+`CommonModule`の参照と`declarations`配列は不要。
+
+
+### ルート
+
+ファイルの次の部分は、ルートを構成する場所である。ルートは、ユーザがリンクをクリックした際に、またはURLをブラウザのアドレスバーに貼り付けた際に表示するビューをルーターに伝える。
+
+`app-routing.module.ts`はすでに`HeroesComponent`をインポートしているので、`routes`配列で使える。
+
+`src/app/app-routing.module.ts`
+
+```typescript
+const routes: Routes = [
+  { path: 'heroes', component: HeroesComponent }
+];
+```
+
+
+典型的なAngularの`Route`は2つの要素を持つ。
+
+* `path`：ブラウザのアドレスバーにあるURLにマッチする配列
+* `component`：そのルートに遷移する際にルーターが作成すべきコンポーネント
+
+これによって、ルーターはそのURLを`path: 'heroes'`に一致させて、URLが`localhost:4200/heroes`のようなものに限って`HeroesComponent`を表示できる。
+
+### [`RouterModule.forRoot()`](https://angular.jp/api/router/RouterModule#forRoot)
+
+[`@NgModule`](https://angular.jp/api/core/NgModule)メタデータはルーターを初期化してブラウザのロケーションの変更を待機する。
+
+以下の行は、[`RouterModule`](https://angular.jp/api/router/RouterModule)を`AppRoutingModule`の`imports`配列に追加し、`RouterModule.forRoot()`を呼び出してワンステップで`routes`に追加。
+
+`src/app/app-routing.module.ts`
+
+```typescript
+imports: [ RouterModule.forRoot(routes) ],
+```
+
+<blockquote>
+
+【解説】
+
+<br>
+<br>
+
+アプリケーションのルートのレベルでルーターを設定しているので、このメソッドは`forRoot()`と呼ばれる。<b>このメソッドは、ルーティングに必要なサービスやプロバイダーとディレクティブを提供し、ブラウザの現在のURLをベースに最初の遷移を行う。</b>
+
+</blockquote>
+
+次に、`AppRoutingModule`は`RouterModule`をエクスポートして、アプリケーション全体で利用できるようにする。
+
+`src/app/app-routing.module.ts`
+
+```typescript
+exports: [ RouterModule ]
+```
