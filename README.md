@@ -505,7 +505,7 @@ export class HeroesComponent implements OnInit {
 
 選択されたヒーローを装飾するために、先に追加したスタイルの中にある`.selected`というCSSクラスを追加できる。ユーザがクリックした時に`.selected`クラスを`<li>`に適用するためには、クラスバインディングを使用する。
 
-**Angularのクラスバインディングは条件に応じてCSSクラスを追加したり削除したりできる。装飾したい要素に`[class.some-css-class]="some-condition"`**を追加するだけで動く。
+<b>Angularのクラスバインディングは条件に応じてCSSクラスを追加したり削除したりできる。装飾したい要素に`[class.some-css-class]="some-condition"`を追加するだけ</b>で動く。
 
 `heroes.component.html`
 
@@ -1228,3 +1228,27 @@ $ ng serve
 ブラウザを更新するとアプリケーションのタイトルは表示されるが、ヒーローのリストは表示されない。
 
 ブラウザのアドレスバーを見ると、URLが`/`で終了。`HeroesComponent`へのルーターのパスは`/heroes`。これを入力すればおなじみのヒーローのマスター／詳細ビューが表示されるはず。(実際には表示されていない)
+
+## ナビゲーションのリンクを追加([`routerLink`](https://angular.jp/api/router/RouterLink))
+
+理想的には、ルートのURLをアドレスバーに貼り付けるのではなく、ユーザがリンクをクリックして遷移できるようにする必要がある。
+
+`<nav>`要素を追加して、その中にクリックされると`HeroesComponent`へ遷移するトリガーになるアンカー要素を追加。修正された`AppComponent`テンプレートは以下のようになる。
+
+`src/app/app.component.html`
+
+```typescript
+<h1>{{title}}</h1>
+<nav>
+  <a routerLink="/heroes">Heroes</a>
+</nav>
+<router-outlet></router-outlet>
+<app-messages></app-messages>
+```
+
+この際、`routerLink`属性は、ルーターが`HeroesComponent`へのルートとして一致する文字列である`"/heroes"`に設定される。この`routerLink`は、ユーザのクリックをルーターのナビゲーションへ変換する`RouterLink`ディレクティブのためのセレクターである。
+
+このとき、ブラウザを更新するとアプリケーションのタイトルとヒーローのリンクは表示されるが、ヒーローのリストは表示されない。
+
+## ダッシュボードビューを追加
+
