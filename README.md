@@ -1672,3 +1672,37 @@ button:disabled {
   cursor: auto;
 }
 ```
+
+## サーバからデータの取得
+
+Angularの`HttpClient`を使ってCRUDモデルを構築する
+
+* `HeroService`はHTTPリクエストを介してヒーローデータを取得
+* ユーザはヒーロー情報を追加、編集、削除でき、その変更をHTTP経由で伝達できる。
+* ユーザは名前でヒーロー情報を検索できる
+
+## HTTPサービスの有効化
+
+`HttpClient`はHTTPを通してリモートサーバと通信するための仕組み。
+
+`HttpClient`をインポートしてルートの`AppModule`に追加。
+
+`src/app/app.module.ts`
+
+```ts
+import { HttpClientModule } from '@angular/common/http';
+```
+
+また、`AppModule`で`HttpClientModule`を`imports`配列に追加する。
+
+`src/app/app.module.ts`
+
+```ts
+import { HttpClientModule } from '@angular/common/http';
+...
+@NgModule({
+  imports: [
+    HttpClientModule,
+  ],
+})
+```
