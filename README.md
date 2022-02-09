@@ -1706,3 +1706,87 @@ import { HttpClientModule } from '@angular/common/http';
   ],
 })
 ```
+
+## データサーバをシミュレートする
+
+[In-memory Web API](https://github.com/angular/angular/tree/master/packages/misc/angular-in-memory-web-api)でリモートサーバとの通信を再現する。
+
+このモジュールをインストールすると、アプリケーションはインメモリWeb APIがリクエストをインターセプトして、そのリクエストをインメモリデータストアに適用してシミュレートされたレスポンスを返えさずに`HttpClient`でリクエストを送信、レスポンスを受信できます。
+
+以下のコマンドを使って、npmからAPIをインストール。
+
+```
+npm install angular-in-memory-web-api --save
+```
+
+`AppModule`で、`HttpClientInMemoryWebApiModule`と、これからすぐに作成する`InMemoryDataService`クラスをインポート。
+
+`src/app/app.module.ts`
+
+```ts
+import { HttpClientInMemoryWebApiModule } from 'angular-in-memory-web-api';
+import { InMemoryDataService } from './in-memory-data.service';
+```
+
+`HttpClientModule`の後に、`HttpClientInMemoryWebApiModule`を`AppModule`の`imports`配列に追加し、`InMemoryDataService`で設定。
+
+```ts
+HttpClientModule,
+
+
+HttpClientInMemoryWebApiModule.forRoot(
+  InMemoryDataService, { dataEncapsulation: false }
+)
+```
+
+`forRoot()`設定メソッドは、インメモリデータベースを準備する`InMemoryDataService`クラスを取る。
+
+以下のコマンドで`src/app/in-memory-data.service.ts`クラスを生成
+
+```
+ng generate service InMemoryData
+```
+
+`in-memory-data.service.ts`のデフォルトの内容を以下のものに置き換える。
+
+`src/app/in-memory-data.service.ts`
+
+```ts
+import { Injectable } from '@angular/core';
+import { InMemoryDbService } from 'angular-in-memory-web-api';
+import { Hero } from './hero';
+
+@Injectable({
+  providedIn: 'root',
+})
+export class InMemoryDataService implements InMemoryDbService {
+  createDb() {
+    const heroes = [
+      { id: 11, name: 'Dr Nice' },
+      { id: 12, name: 'Narco' },
+      { id: 13, name: 'Bombasto' },
+      { id: 14, name: 'Celeritas' },
+      { id: 15, name: 'Magneta' },
+      { id: 16, name: 'RubberMan' },
+      { id: 17, name: 'Dynama' },
+      { id: 18, name: 'Dr IQ' },
+      { id: 19, name: 'Magma' },
+      { id: 20, name: 'Tornado' }
+    ];
+    return {heroes};
+  }
+
+  // Overrides the genId method to ensure that a hero always has an id.
+  // If the heroes array is empty,
+  // the method below returns the initial number (11).
+  // if the heroes array is not empty, the method below returns the highest
+  // hero id + 1.
+  genId(heroes: Hero[]): number {
+    return heroes.length > 0 ? Math.max(...heroes.map(hero => hero.id)) + 1 : 11;
+  }
+}
+```
+
+この際、`in-memory-data.service.ts`ファイルは`mock-heroes.ts`の機能を継承。しかし、まだ`mock-heroes.ts`は削除しない。
+
+サーバが用意できたら、アプリケーションのリクエストはサーバに送信される。
