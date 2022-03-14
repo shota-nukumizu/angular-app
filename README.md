@@ -1,6 +1,6 @@
 # Angular
 
-Angularで簡単なアプリを開発。(チュートリアル)
+Angularでヒーローを表示するアプリ(CRUDモデルの練習)を開発。(チュートリアル)
 
 公式サイト：[Angular](https://angular.jp/)
 
