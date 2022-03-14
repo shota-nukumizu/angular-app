@@ -1790,3 +1790,9 @@ export class InMemoryDataService implements InMemoryDbService {
 この際、`in-memory-data.service.ts`ファイルは`mock-heroes.ts`の機能を継承。しかし、まだ`mock-heroes.ts`は削除しない。
 
 サーバが用意できたら、アプリケーションのリクエストはサーバに送信される。
+
+# 余談
+
+Angularはコマンド入力だけで機能を実装するのに必要なプロジェクトを簡単に出力できるのが最大の特徴。フロントエンドフレームワークと呼ばれているので、柔軟性は低いけど簡単にフロントエンドを構築できる。
+
+最近の開発でハマっているNestはAngularのバックエンドバージョンみたいなものである。
